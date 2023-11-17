@@ -1,0 +1,52 @@
+For quick installation, please refer to docs/INSTALL and docs/FAQ
+For detailed documentation, please see docs/ or http://github.com/ptt/pttbbs/wiki
+
+If you have any questions, please go to the PttCurrent board of PTT Industrial Center (telnet://ptt.cc).
+Or browse PttCurrent’s board online at http://www.ptt.cc/bbs/PttCurrent/
+and the essence area http://www.ptt.cc/man/PttCurrent/
+
+Directory Structure:
+
+         LICENSE The licensing method for each file of this software when not otherwise specified.
+                                     Please note that some files use different licenses (such as BSD License)
+                                     Due to GPL restrictions, code that is licensed incompatible has been defaulted to not being used
+                                     GPL-compliant versions of alternative code are provided to maintain functional integrity.
+                                     Please see the text of each file for details and settings.
+
+         docs/documents
+
+                 ADVANCE advanced features
+                 ANCESTOR inherits history
+                 DONATE sponsorship method
+                 FAQ Frequently asked questions, how to set sendmail.cf, etc.
+                 INSTALL quick installation method
+                 For descriptions of each file in proto/ mbbsd/, please see the README of this directory.
+                 z6ibbs.[12].txt in2 Essay
+
+         sample/ example
+
+                 crontab provides settings that must be run regularly through crontab when bbs is executed.
+                 pttbbs.sh FreeBSD rc automatic execution example (/usr/local/etc/rc.d)
+                 rc.local Linux rc automatic execution example (/etc/rc.local)
+                 pttbbs.conf sample configuration file (complete)
+                 pttbbs_minimal.conf minimum configuration file
+
+         daemon/ background service server program
+
+                 angelbeats/little angel related services
+                 banipd/ determines whether the IP has been banned (experimental)
+                 barebone/servo program skeleton
+                 boardd/ Kanban article service (for web)
+                 brcstored/ BRC storage service (failed experimental)
+                 commentd/ Tweet recording service (experimental)
+                 fromd/ hometown query
+                 logind/ Massive login pre-program
+                 mand/ Essence Area Article Service (for web)
+                 postd/ article recording service (experimental)
+                 regmaild/ Register email related services
+                 utmpd/ utmp cache server (experimental)
+                 wsproxy/ websocket to telnet bbs proxy (experimental)
+
+         include/include file
+         common/ common library
+         mbbsd/ bbs text mode (terminal) main program
