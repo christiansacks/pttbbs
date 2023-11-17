@@ -1,0 +1,158 @@
+This document explains how to quickly install,
+For other latest installation related instructions, please also refer to: https://github.com/ptt/pttbbs/wiki content
+
+==============
+With root privileges
+==============
+
+  Add two accounts with UID 9999 on the host, named bbs and bbsadm respectively.
+  The home directory is set to /home/bbs, the Group is named bbs, and GID=99.
+  The shell of bbs is set to /home/bbs/bin/bbsrf, and there is no password.
+  Set the shell of bbsadm to /bin/sh (or csh, bash, whichever you like) and set the password.
+
+  Take Linux such as Debian as an example:
+
+  1. Type vipw and add the following two lines
+
+     bbs::9999:99:PttBBS,,,:/home/bbs:/home/bbs/bin/bbsrf
+     bbsadm::9999:99:PttBBS,,,:/home/bbs:/bin/bash
+
+  2. Execute passwd bbsadm to set the password of bbsadm
+
+  3. Add a line to /etc/group
+
+     bbs:x:99:
+
+  4. Execute mkdir /home/bbs
+
+  5. Execute chown -R bbs:bbs /home/bbs
+
+  6. Execute chmod 700 /home/bbs
+
+  Of course, you can also use adduesr or useradd and other programs to help create and configure.
+  For other environments (such as FreeBSD), please refer to the relevant operating system instructions.
+
+====================
+The following uses the identity of bbsadm
+====================
+
+  7. You can download the original code of this site through the following methods:
+     https://github.com/ptt/pttbbs
+     This is the currently mainly developed version, and is also the two platforms of PiKiKi Industrial Forum and PiKiKiTu.
+     The version used. This version contains the latest programs, but may be unstable.
+     There are bugs and are even incompatible with previous versions. It is recommended that you have basic programming skills and
+     Keep an eye on the PttCurrent dashboard (at telnet://ptt.cc, or use
+     Web version http://www.ptt.cc/bbs/PttCurrent/index.html), especially
+     This is when you update the program.
+
+     git clone http://github.com/ptt/pttbbs
+
+     You can directly update to the latest source code of pttbbs through git pull in this directory. For example:
+     cd /home/bbs/pttbbs; git pull; git rebase
+
+  8. Switch to the directory of pttbbs (cd /home/bbs/pttbbs)
+
+  9. If your pttbbs.conf does not exist, you can copy the default one for use:
+      cp sample/pttbbs.conf pttbbs.conf
+
+  10. Modify pttbbs.conf according to your needs
+     Please note that the default pttbbs.conf is for fairly large bbs.
+     Often you will need to modify it to suit your needs.
+
+     If you are compiling and installing PttBBS on a 64bit operating system
+     Please remember to uncomment the following two definitions in pttbbs.conf:
+
+     #define SHMALIGNEDSIZE (1048576*4)
+     #define TIMET64
+
+     * If you are using a Linux system, please install pmake first, and then change make alias to pmake *
+     * If you are using MacOSX system, please install bmake through ports first,
+       Then change make alias into pmake *
+
+     The following is a list of packages recommended to be installed before compilation:
+     You can use apt / yum and other package administrator commands to check whether you have installed it:
+     bmake, ccache, clang, gcc, git, libevent-dev/libevent-devel,
+     pkg-config/pkgconfig/pkgconf, python
+
+  11.(Under /home/bbs/pttbbs) Execute make clean; make all install
+
+  12. If it is a newly established website, please execute cd sample; make install
+
+  13.Execute cd /home/bbs; bin/initbbs -DoIt
+
+Steps 13 and 14 are for the first installation.
+If you already have information in your BBS, please be sure not to perform these two steps.
+
+If everything goes well, the installation is probably complete, and the next step is to start bbs.
+
+  15. Execute /home/bbs/bin/shmctl init (*Note 1, *Note 2)
+
+  16. Use root to execute /home/bbs/bin/mbbsd -p 23 -d (*Note 3)
+     Among them, -d is to specify the daemon mode. If there is a connection problem and you need to facilitate testing, you can not add -d first.
+     Use a separate window to connect directly to facilitate troubleshooting.
+
+  17. Test whether the entire system is complete:
+     telnet localhost 23 see
+
+     Create a new account called SYSOP, then logout and then login. This way you will have webmaster permissions~
+     Create a new account called guest so that others can use guest to visit your site.
+
+     (If the system responds "This code cannot be accepted", please create a guest0 account first.
+      Then change SYSOP to log in and rename guest0 to guest, and set the permissions by the way)
+
+     For methods of opening boards, opening groups, and moving groups, please see the summary of the PttSrc board in ptt2.cc
+
+  18. For related advanced functions, please refer to ADVANCE
+
+  19. In order to make bbs (and necessary programs) run by itself when booting,
+     If you use Linux, you can refer to the contents of /home/bbs/sample/rc.local
+     Create the /etc/rc.local file with root privileges, copy the content into it, and set the permissions to executable
+
+     You can then restart your computer and try to see if it works normally after the restart :)
+
+  20.pttbbs needs to execute some small tools regularly to maintain the normal operation of the system.
+     Reload cache, backup, system information such as holiday song requests, or other special external programs, etc.
+     Please use bbs authority to execute crontab -e. Please refer to sample/crontab for the content.
+     (In most cases, copy the contents of sample/crontab directly into
+     Or directly crontab /home/bbs/pttbbs/sample/crontab
+
+  21. In some cases, pttbbs will need some other programs to assist.
+
+     The required programs are listed below. The path to which the program belongs can be queried using the command: type <program name>
+
+         tar
+         gzip
+         rm
+         perl
+         mutt
+         lynx
+
+     Most of our perl scripts will use LocalVars.pm, which is responsible for defining
+     Machine-specific settings (such as paths to external programs).
+     Please copy /home/bbs/pttbbs/sample/LocalVars.pm to /home/bbs/bin/
+     Download, and modify the file to match your environment's settings.
+
+     Also list the perl modules that our perl script will use.
+         Mail::Sender
+         IO::All
+
+Note:
+1. This program is used in initial shared memory and can only be executed for the first time after booting, or
+    You need to execute it after clearing shm manually.
+
+2. If you ran shmctl init or uhash_loader and did not see
+       total XXXXX names loaded.
+    Instead I see other error messages
+     (For example [shmget error] key = 4cc, errno = 22: Invalid argument)
+    It may be that the shared-memory limit of your operating system is insufficient.
+    Please refer to the docs/FAQ for instructions on enlarging the shared-memory section.
+
+3. bin/mbbsd -p 23 specifies to bind port 23. According to UNIX regulations, ports below 1024
+    You need to have root permissions, so if you want to bind 23 port, you need to use root to execute it.
+    3000 port is not required.
+    Please refer to docs/ADVANCE to install bbsctl,
+    Then you can use bbsctl directly under other permissions (such as bbsadm)
+    to start mbbsd that can bind port 23.
+    For very large sites of ptt/ptt2 scale, another option is to use daemon/logind.
+
+4. You must install git first (please refer to the official website http://git-scm.com/)
